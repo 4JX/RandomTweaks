@@ -25,7 +25,7 @@ namespace RandomTweaks
     }
 
     [HarmonyPatch(typeof(BuildManager), "Awake")]
-    public static class Wawo
+    public static class PatchZoomLimits
     {
         [HarmonyPrefix]
         public static void DrawRegionalOutline(ref BuildManager __instance)
