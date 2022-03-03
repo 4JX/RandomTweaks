@@ -28,7 +28,7 @@ namespace RandomTweaks
     public static class PatchZoomLimits
     {
         [HarmonyPrefix]
-        public static void DrawRegionalOutline(ref BuildManager __instance)
+        public static void Prefix(ref BuildManager __instance)
         {
             __instance.buildCamera.maxCameraDistance = 300;
             __instance.buildCamera.minCameraDistance = 0.1f;
