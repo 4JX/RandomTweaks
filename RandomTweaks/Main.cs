@@ -29,7 +29,18 @@ namespace RandomTweaks
 
 		private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
 		{
-			
+
+			if (scene.name == "World_PC")
+			{
+				worldViewObject = new GameObject("RandomTweaksWorldPcGuiObject");
+				worldViewObject.AddComponent<WorldView>();
+				worldViewObject.AddComponent<Throttle>();
+				UnityEngine.Object.DontDestroyOnLoad(worldViewObject);
+				worldViewObject.SetActive(true);
+				return;
+			}
+
+			UnityEngine.Object.Destroy(Main.worldViewObject);
 		}
 
 		public void unload()
@@ -38,5 +49,7 @@ namespace RandomTweaks
 		}
 
 		public static Harmony patcher;
+
+		public static GameObject worldViewObject;
 	}
 }
