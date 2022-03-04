@@ -45,39 +45,48 @@ namespace RandomTweaks
         public static void Prefix(ref BuildMenus __instance)
         {
             KeysNode keysNode = BuildManager.main.build_Input.keysNode;
-            keysNode.AddOnKeyDown(Key.Ctrl_(KeyCode.UpArrow), MoveSelectedPartsUp);
-            keysNode.AddOnKeyDown(Key.Ctrl_(KeyCode.LeftArrow), MoveSelectedPartsLeft);
-            keysNode.AddOnKeyDown(Key.Ctrl_(KeyCode.DownArrow), MoveSelectedPartsDown);
-            keysNode.AddOnKeyDown(Key.Ctrl_(KeyCode.RightArrow), MoveSelectedPartsRight);
+            Key upArrow = KeyCode.UpArrow;
+            Key downArrow = KeyCode.DownArrow;
+            Key leftArrow = KeyCode.LeftArrow;
+            Key rightArrow = KeyCode.RightArrow;
+
+            Vector2 direction = new Vector2( 0.5f, 0f );
+
+            keysNode.AddOnKeyDown(upArrow, () => MoveSelectedParts(PartMoveDirection.Up));
+            keysNode.AddOnKeyDown(downArrow, () => MoveSelectedParts(PartMoveDirection.Down));
+            keysNode.AddOnKeyDown(leftArrow, () => MoveSelectedParts(PartMoveDirection.Left));
+            keysNode.AddOnKeyDown(rightArrow, () => MoveSelectedParts(PartMoveDirection.Right));
         }
 
-        public static void MoveSelectedPartsLeft()
+        public static void MoveSelectedParts(PartMoveDirection direction)
         {
             Part[] parts = BuildManager.main.holdGrid.selector.selected.ToArray();
 
-            Part_Utility.OffsetPartPosition(new Vector2(-0.5f, 0), true, parts);
+            switch (direction) {
+                case PartMoveDirection.Up:
+                    Part_Utility.OffsetPartPosition(new Vector2(0, 0.5f), true, parts);
+                    break;
+                case PartMoveDirection.Down:
+                    Part_Utility.OffsetPartPosition(new Vector2(0, -0.5f), true, parts);
+                    break;
+                case PartMoveDirection.Left:
+                    Part_Utility.OffsetPartPosition(new Vector2(-0.5f, 0), true, parts);
+                    break;
+                case PartMoveDirection.Right:
+                    Part_Utility.OffsetPartPosition(new Vector2(0.5f, 0), true, parts);
+                    break;
+            }
+            
         }
 
-        public static void MoveSelectedPartsRight()
-        {
-            Part[] parts = BuildManager.main.holdGrid.selector.selected.ToArray();
+    }
 
-            Part_Utility.OffsetPartPosition(new Vector2(0.5f, 0), true, parts);
-        }
-
-        public static void MoveSelectedPartsUp()
-        {
-            Part[] parts = BuildManager.main.holdGrid.selector.selected.ToArray();
-
-            Part_Utility.OffsetPartPosition(new Vector2(0, 0.5f), true, parts);
-        }
-
-        public static void MoveSelectedPartsDown()
-        {
-            Part[] parts = BuildManager.main.holdGrid.selector.selected.ToArray();
-
-            Part_Utility.OffsetPartPosition(new Vector2(0, -0.5f), true, parts);
-        }
+    public enum PartMoveDirection
+    {
+        Up,
+        Down,
+        Left,
+        Right
     }
 
 }
