@@ -46,12 +46,11 @@ namespace RandomTweaks
         public static void Prefix(ref BuildMenus __instance)
         {
             KeysNode keysNode = BuildManager.main.build_Input.keysNode;
-           
 
-            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.upArrow, () => MoveSelectedParts(PartMoveDirection.Up));
-            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.downArrow, () => MoveSelectedParts(PartMoveDirection.Down));
-            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.leftArrow, () => MoveSelectedParts(PartMoveDirection.Left));
-            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.rightArrow, () => MoveSelectedParts(PartMoveDirection.Right));
+            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Move_Parts[0], () => MoveSelectedParts(PartMoveDirection.Up));
+            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Move_Parts[1], () => MoveSelectedParts(PartMoveDirection.Down));
+            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Move_Parts[2], () => MoveSelectedParts(PartMoveDirection.Left));
+            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Move_Parts[3], () => MoveSelectedParts(PartMoveDirection.Right));
         }
 
         public enum PartMoveDirection
@@ -99,10 +98,15 @@ namespace RandomTweaks
         public static DefaultData custom_keys = new DefaultData();
         public class DefaultData
         {
-            public Key upArrow = KeyCode.UpArrow;
-            public Key downArrow = KeyCode.DownArrow;
-            public Key leftArrow = KeyCode.LeftArrow;
-            public Key rightArrow = KeyCode.RightArrow;
+
+            public Key[] Move_Parts = new Key[4]
+            {
+                KeyCode.UpArrow,
+                KeyCode.DownArrow,
+                KeyCode.LeftArrow,
+                KeyCode.RightArrow
+            };
+          
         }
 
         // Loads automatically(?), no need for a hook here
@@ -119,14 +123,14 @@ namespace RandomTweaks
             DefaultData defaultData = new DefaultData();
 
             // Reflection needed since these are private
-            Traverse createTraverse = Traverse.Create(__instance).Method("Create", new object[] { custom_keys.upArrow, defaultData.upArrow, "Move_Selected_Up" });
+            Traverse createTraverse = Traverse.Create(__instance).Method("Create", new object[] { custom_keys.Move_Parts[0], defaultData.Move_Parts[0], "Move_Selected_Up" });
             Traverse createSpaceTraverse = Traverse.Create(__instance).Method("CreateSpace");
 
             // Finally actually call the code
-            createTraverse.GetValue(new object[] { custom_keys.upArrow, defaultData.upArrow, "Move_Selected_Up" });
-            createTraverse.GetValue(new object[] { custom_keys.downArrow, defaultData.downArrow, "Move_Selected_Down" });
-            createTraverse.GetValue(new object[] { custom_keys.leftArrow, defaultData.leftArrow, "Move_Selected_Left" });
-            createTraverse.GetValue(new object[] { custom_keys.rightArrow, defaultData.rightArrow, "Move_Selected_Right" });
+            createTraverse.GetValue(new object[] { custom_keys.Move_Parts[0], defaultData.Move_Parts[0], "Move_Selected_Up" });
+            createTraverse.GetValue(new object[] { custom_keys.Move_Parts[1], defaultData.Move_Parts[1], "Move_Selected_Down" });
+            createTraverse.GetValue(new object[] { custom_keys.Move_Parts[2], defaultData.Move_Parts[2], "Move_Selected_Left" });
+            createTraverse.GetValue(new object[] { custom_keys.Move_Parts[3], defaultData.Move_Parts[3], "Move_Selected_Right" });
             createSpaceTraverse.GetValue();
             createSpaceTraverse.GetValue();
             createSpaceTraverse.GetValue();
@@ -144,9 +148,13 @@ namespace RandomTweaks
     public class KeybindsSaveHook
     {
         [HarmonyPostfix]
-        public static void SaveHook()
+        public static void SaveHook(Settings<Data> __instance)
         {
-            KeybindsHolder.keybinds.SaveData();
+            // This works. I don't know why. At least it sucessfully prevents infinite loops
+            if (__instance is KeybindingsPC)
+            {
+                KeybindsHolder.keybinds.SaveData();
+            }
         }
     }
 
