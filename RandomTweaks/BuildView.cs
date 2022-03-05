@@ -98,6 +98,7 @@ namespace RandomTweaks
         public static DefaultData custom_keys = new DefaultData();
         public class DefaultData
         {
+            public Key Placeholder_Key = KeyCode.Hash;
 
             public Key[] Move_Parts = new Key[4]
             {
@@ -127,6 +128,7 @@ namespace RandomTweaks
             Traverse createSpaceTraverse = Traverse.Create(__instance).Method("CreateSpace");
 
             // Finally actually call the code
+            createTraverse.GetValue(new object[] { defaultData.Placeholder_Key, defaultData.Placeholder_Key, "--RandomTweaks Keybinds--" });
             createTraverse.GetValue(new object[] { custom_keys.Move_Parts[0], defaultData.Move_Parts[0], "Move_Selected_Up" });
             createTraverse.GetValue(new object[] { custom_keys.Move_Parts[1], defaultData.Move_Parts[1], "Move_Selected_Down" });
             createTraverse.GetValue(new object[] { custom_keys.Move_Parts[2], defaultData.Move_Parts[2], "Move_Selected_Left" });
@@ -134,6 +136,7 @@ namespace RandomTweaks
             createSpaceTraverse.GetValue();
             createSpaceTraverse.GetValue();
             createSpaceTraverse.GetValue();
+            createTraverse.GetValue(new object[] { defaultData.Placeholder_Key, defaultData.Placeholder_Key, "--Vanilla Keybinds--" });
         }
 
         public void SaveData()
