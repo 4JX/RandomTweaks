@@ -18,3 +18,7 @@ Feel free to suggest new features.
 - Remove the second popup when entering a world prompting you to clear the build area
 
 ![Image](images/EnterWorldOptions.png)
+
+- Enable the new experimental build mode
+
+![Image](images/NewBuildModeToggle.gif)

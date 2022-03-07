@@ -8,6 +8,7 @@ using SFS.IO;
 using SFS.Parts;
 using SFS.Parts.Modules;
 using SFS.Recovery;
+using SFS.UI;
 using UnityEngine;
 using static SFS.Input.KeybindingsPC;
 
@@ -59,6 +60,9 @@ namespace RandomTweaks
             keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Resize_Parts[3], () => ResizeSelectedParts(PartResizeType.DecreaseWidth));
             keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Resize_Parts[0], () => ResizeSelectedParts(PartResizeType.IncreaseHeight));
             keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Resize_Parts[1], () => ResizeSelectedParts(PartResizeType.DecreaseHeight));
+
+            // New build mode
+            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Toggle_New_Build_System, () => NewBuildSystemHook.ToggleNewBuild());
         }
 
         public enum PartMoveDirection
@@ -239,6 +243,8 @@ namespace RandomTweaks
                 Key.Ctrl_(KeyCode.RightArrow)
             };
 
+            public Key Toggle_New_Build_System = KeyCode.N;
+
         }
 
         // Loads automatically(?), no need for a hook here
@@ -269,6 +275,8 @@ namespace RandomTweaks
             createTraverse.GetValue(new object[] { custom_keys.Resize_Parts[1], defaultData.Resize_Parts[1], "Decrease_Part_Height" });
             createTraverse.GetValue(new object[] { custom_keys.Resize_Parts[2], defaultData.Resize_Parts[2], "Increase_Part_Width" });
             createTraverse.GetValue(new object[] { custom_keys.Resize_Parts[3], defaultData.Resize_Parts[3], "Decrease_Part_Width" });
+            createSpaceTraverse.GetValue();
+            createTraverse.GetValue(new object[] { custom_keys.Toggle_New_Build_System, defaultData.Toggle_New_Build_System, "Toggle_New_Build_Mode" });
             createSpaceTraverse.GetValue();
             createSpaceTraverse.GetValue();
             createSpaceTraverse.GetValue();
@@ -305,6 +313,46 @@ namespace RandomTweaks
         {
             KeybindsHolder.keybinds.AwakeHook(__instance);
         }
+    }
+
+
+    [HarmonyPatch(typeof(DevSettings), "DisableNewBuild", MethodType.Getter)]
+    static class DevSettingsPatches
+    {
+        public static bool disableNewBuild = true;
+
+        [HarmonyPostfix]
+        static void Postfix(ref bool __result)
+        {
+            __result = disableNewBuild;
+        }
+    }
+
+    // This is needed since the original method also checks for the enviorement being an editor
+    [HarmonyPatch(typeof(HoldGrid), "Update")]
+    public static class NewBuildSystemHook
+    {
+
+
+        [HarmonyPrefix]
+        public static bool Prefix(HoldGrid __instance)
+        {
+            if (!DevSettings.DisableNewBuild)
+            {
+                // Reflection time
+                Traverse.Create(__instance).Method("GetSnapPosition_New", new object[] { __instance.position }).GetValue();
+            }
+
+            // Do not let the original method run
+            return false;
+        }
+
+        public static void ToggleNewBuild()
+        {
+            DevSettingsPatches.disableNewBuild = !DevSettingsPatches.disableNewBuild;
+            MsgDrawer.main.Log("New build mode set to: " + (!DevSettingsPatches.disableNewBuild).ToString());
+        }
+        
     }
 
 }
