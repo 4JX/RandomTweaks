@@ -11,9 +11,9 @@ Feel free to suggest new features.
 
 ![Image](images/ExtraZoom.gif)
 
-- Move selected parts with the arrow keys
+- Move and resize the selected parts with the arrow keys. Use shift to get smaller increments (including rotate).
 
-![Image](images/Keybinds.png)
+![Image](images/BpEditingEqsue.gif)
 
 - Remove the second popup when entering a world prompting you to clear the build area
 

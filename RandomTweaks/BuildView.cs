@@ -7,6 +7,7 @@ using SFS.Input;
 using SFS.IO;
 using SFS.Parts;
 using SFS.Parts.Modules;
+using SFS.Recovery;
 using UnityEngine;
 using static SFS.Input.KeybindingsPC;
 
@@ -47,10 +48,17 @@ namespace RandomTweaks
         {
             KeysNode keysNode = BuildManager.main.build_Input.keysNode;
 
+            // For moving
             keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Move_Parts[0], () => MoveSelectedParts(PartMoveDirection.Up));
             keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Move_Parts[1], () => MoveSelectedParts(PartMoveDirection.Down));
             keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Move_Parts[2], () => MoveSelectedParts(PartMoveDirection.Left));
             keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Move_Parts[3], () => MoveSelectedParts(PartMoveDirection.Right));
+
+            // For resizing
+            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Resize_Parts[2], () => ResizeSelectedParts(PartResizeType.IncreaseWidth));
+            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Resize_Parts[3], () => ResizeSelectedParts(PartResizeType.DecreaseWidth));
+            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Resize_Parts[0], () => ResizeSelectedParts(PartResizeType.IncreaseHeight));
+            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Resize_Parts[1], () => ResizeSelectedParts(PartResizeType.DecreaseHeight));
         }
 
         public enum PartMoveDirection
@@ -65,23 +73,138 @@ namespace RandomTweaks
         {
             Part[] parts = BuildManager.main.holdGrid.selector.selected.ToArray();
 
-            switch (direction) {
-                case PartMoveDirection.Up:
-                    Part_Utility.OffsetPartPosition(new Vector2(0, 0.5f), true, parts);
-                    break;
-                case PartMoveDirection.Down:
-                    Part_Utility.OffsetPartPosition(new Vector2(0, -0.5f), true, parts);
-                    break;
-                case PartMoveDirection.Left:
-                    Part_Utility.OffsetPartPosition(new Vector2(-0.5f, 0), true, parts);
-                    break;
-                case PartMoveDirection.Right:
-                    Part_Utility.OffsetPartPosition(new Vector2(0.5f, 0), true, parts);
-                    break;
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                switch (direction)
+                {
+                    case PartMoveDirection.Up:
+                        Part_Utility.OffsetPartPosition(new Vector2(0, 0.1f), false, parts);
+                        break;
+                    case PartMoveDirection.Down:
+                        Part_Utility.OffsetPartPosition(new Vector2(0, -0.1f), false, parts);
+                        break;
+                    case PartMoveDirection.Left:
+                        Part_Utility.OffsetPartPosition(new Vector2(-0.1f, 0), false, parts);
+                        break;
+                    case PartMoveDirection.Right:
+                        Part_Utility.OffsetPartPosition(new Vector2(0.1f, 0), false, parts);
+                        break;
+                }
             }
-            
+            else
+            {
+                switch (direction)
+                {
+                    case PartMoveDirection.Up:
+                        Part_Utility.OffsetPartPosition(new Vector2(0, 0.5f), true, parts);
+                        break;
+                    case PartMoveDirection.Down:
+                        Part_Utility.OffsetPartPosition(new Vector2(0, -0.5f), true, parts);
+                        break;
+                    case PartMoveDirection.Left:
+                        Part_Utility.OffsetPartPosition(new Vector2(-0.5f, 0), true, parts);
+                        break;
+                    case PartMoveDirection.Right:
+                        Part_Utility.OffsetPartPosition(new Vector2(0.5f, 0), true, parts);
+                        break;
+                }
+            }
         }
 
+        public enum PartResizeType
+        {
+            IncreaseWidth,
+            DecreaseWidth,
+            IncreaseHeight,
+            DecreaseHeight
+        }
+
+        public static void ResizeSelectedParts(PartResizeType resize_type)
+        {
+            Part[] parts = BuildManager.main.holdGrid.selector.selected.ToArray();
+
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                switch (resize_type)
+                {
+                    case PartResizeType.IncreaseWidth:
+                        ResizeParts(new Vector3(0.1f, 0, 0), parts);
+                        break;
+                    case PartResizeType.DecreaseWidth:
+                        ResizeParts(new Vector3(-0.1f, 0, 0), parts);
+                        break;
+                    case PartResizeType.IncreaseHeight:
+                        ResizeParts(new Vector3(0, 0.1f, 0), parts);
+                        break;
+                    case PartResizeType.DecreaseHeight:
+                        ResizeParts(new Vector3(0, -0.1f, 0), parts);
+                        break;
+                }
+            }
+            else
+            {
+                switch (resize_type)
+                {
+                    case PartResizeType.IncreaseWidth:
+                        ResizeParts(new Vector3(0.5f, 0, 0), parts);
+                        break;
+                    case PartResizeType.DecreaseWidth:
+                        ResizeParts(new Vector3(-0.5f, 0, 0), parts);
+                        break;
+                    case PartResizeType.IncreaseHeight:
+                        ResizeParts(new Vector3(0, 0.5f, 0), parts);
+                        break;
+                    case PartResizeType.DecreaseHeight:
+                        ResizeParts(new Vector3(0, -0.5f, 0), parts);
+                        break;
+                }
+            }
+
+        }
+
+        static void ResizeParts(Vector3 resizeAmount, Part[] parts)
+        {
+            for (int i = 0; i < parts.Length; i++)
+            {
+                double width_original = parts[i].variablesModule.doubleVariables.GetValue("width_original");
+                double width_upper = parts[i].variablesModule.doubleVariables.GetValue("width_a");
+                double width_lower = parts[i].variablesModule.doubleVariables.GetValue("width_b");
+                double height = parts[i].variablesModule.doubleVariables.GetValue("height");
+
+                double new_width_upper = width_upper + resizeAmount.x;
+                double new_width_lower = width_lower + resizeAmount.x;
+                // Loosely preserve the final size if the sizes are not equal
+                double new_width_original = Math.Min(new_width_upper, new_width_lower);
+                double new_height = height + resizeAmount.y;
+
+                parts[i].variablesModule.doubleVariables.SetValue("width_original", new_width_original);
+                parts[i].variablesModule.doubleVariables.SetValue("width_a", new_width_upper);
+                parts[i].variablesModule.doubleVariables.SetValue("width_b", new_width_lower);
+                parts[i].variablesModule.doubleVariables.SetValue("height", new_height);
+            }
+        }
+
+    }
+
+    // Rotate on small increments if shift is held (Feature parity with the above)
+    [HarmonyPatch(typeof(BuildMenus), nameof(BuildMenus.Rotate))]
+    public static class RotatePatch
+    {
+        [HarmonyPrefix]
+        public static void Prefix(ref float rotation)
+        {
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                // Only affect 90º Rotations
+                if (rotation == 90f)
+                {
+                    rotation = 15f;
+
+                } else if (rotation == -90f) {
+                    rotation = -15f;
+                }
+            }
+        }
     }
 
     // Make everything use the same CustomKeybinds
@@ -107,7 +230,15 @@ namespace RandomTweaks
                 KeyCode.LeftArrow,
                 KeyCode.RightArrow
             };
-          
+
+            public Key[] Resize_Parts = new Key[4]
+            {
+                Key.Ctrl_(KeyCode.UpArrow),
+                Key.Ctrl_(KeyCode.DownArrow),
+                Key.Ctrl_(KeyCode.LeftArrow),
+                Key.Ctrl_(KeyCode.RightArrow)
+            };
+
         }
 
         // Loads automatically(?), no need for a hook here
@@ -134,9 +265,13 @@ namespace RandomTweaks
             createTraverse.GetValue(new object[] { custom_keys.Move_Parts[2], defaultData.Move_Parts[2], "Move_Selected_Left" });
             createTraverse.GetValue(new object[] { custom_keys.Move_Parts[3], defaultData.Move_Parts[3], "Move_Selected_Right" });
             createSpaceTraverse.GetValue();
+            createTraverse.GetValue(new object[] { custom_keys.Resize_Parts[0], defaultData.Resize_Parts[0], "Increase_Part_Height" });
+            createTraverse.GetValue(new object[] { custom_keys.Resize_Parts[1], defaultData.Resize_Parts[1], "Decrease_Part_Height" });
+            createTraverse.GetValue(new object[] { custom_keys.Resize_Parts[2], defaultData.Resize_Parts[2], "Increase_Part_Width" });
+            createTraverse.GetValue(new object[] { custom_keys.Resize_Parts[3], defaultData.Resize_Parts[3], "Decrease_Part_Width" });
             createSpaceTraverse.GetValue();
             createSpaceTraverse.GetValue();
-            createTraverse.GetValue(new object[] { defaultData.Placeholder_Key, defaultData.Placeholder_Key, "--Vanilla Keybinds--" });
+            createSpaceTraverse.GetValue();
         }
 
         public void SaveData()
@@ -173,3 +308,5 @@ namespace RandomTweaks
     }
 
 }
+
+
