@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using HarmonyLib;
-using ModLoader;
+﻿using HarmonyLib;
 using SFS.Builds;
 using SFS.Input;
 using SFS.IO;
 using SFS.Parts;
 using SFS.Parts.Modules;
-using SFS.Recovery;
 using SFS.UI;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using static SFS.Input.KeybindingsPC;
 
@@ -204,7 +202,9 @@ namespace RandomTweaks
                 {
                     rotation = 15f;
 
-                } else if (rotation == -90f) {
+                }
+                else if (rotation == -90f)
+                {
                     rotation = -15f;
                 }
             }
@@ -218,7 +218,7 @@ namespace RandomTweaks
     }
 
     // Akin to KeybindingsPC, holds the relevant keys not already included
-    public class CustomKeybinds: Settings<CustomKeybinds.DefaultData>
+    public class CustomKeybinds : Settings<CustomKeybinds.DefaultData>
     {
         protected override string FileName => "RandomTweaksKeybinds";
 
@@ -255,7 +255,7 @@ namespace RandomTweaks
 
         public void AwakeHook(KeybindingsPC __instance)
         {
-          
+
             // Load the saved and default keys
             Load();
             DefaultData defaultData = new DefaultData();
@@ -352,7 +352,7 @@ namespace RandomTweaks
             DevSettingsPatches.disableNewBuild = !DevSettingsPatches.disableNewBuild;
             MsgDrawer.main.Log("New build mode set to: " + (!DevSettingsPatches.disableNewBuild).ToString());
         }
-        
+
     }
 
 }

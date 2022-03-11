@@ -18,7 +18,7 @@ namespace RandomTweaks
             Event current = Event.current;
             if (current.keyCode == KeyCode.O)
             {
-                
+
             }
 
             //windowRect = GUI.Window(GUIUtility.GetControlID(FocusType.Passive), windowRect, new GUI.WindowFunction(windowFunc), "Advanced");
