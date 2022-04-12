@@ -61,6 +61,12 @@ namespace RandomTweaks
 
             // New build mode
             keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Toggle_New_Build_System, () => NewBuildSystemHook.ToggleNewBuild());
+            
+            // Setting the new values
+            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Set_Values[0], () => ClassHolder.player_preferences.SetSmallMove());
+            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Set_Values[1], () => ClassHolder.player_preferences.SetSmallRotate());
+            keysNode.AddOnKeyDown(CustomKeybinds.custom_keys.Set_Values[2], () => ClassHolder.player_preferences.SetSmallResize());
+
         }
 
         public enum PartMoveDirection
@@ -75,21 +81,24 @@ namespace RandomTweaks
         {
             Part[] parts = BuildManager.main.holdGrid.selector.selected.ToArray();
 
+            float normal_move = PlayerPreferences.custom_values.normal_move;
+            float small_move = PlayerPreferences.custom_values.small_move;
+
             if (Input.GetKey(KeyCode.LeftShift))
             {
                 switch (direction)
                 {
                     case PartMoveDirection.Up:
-                        Part_Utility.OffsetPartPosition(new Vector2(0, 0.1f), false, parts);
+                        Part_Utility.OffsetPartPosition(new Vector2(0, small_move), false, parts);
                         break;
                     case PartMoveDirection.Down:
-                        Part_Utility.OffsetPartPosition(new Vector2(0, -0.1f), false, parts);
+                        Part_Utility.OffsetPartPosition(new Vector2(0, -small_move), false, parts);
                         break;
                     case PartMoveDirection.Left:
-                        Part_Utility.OffsetPartPosition(new Vector2(-0.1f, 0), false, parts);
+                        Part_Utility.OffsetPartPosition(new Vector2(-small_move, 0), false, parts);
                         break;
                     case PartMoveDirection.Right:
-                        Part_Utility.OffsetPartPosition(new Vector2(0.1f, 0), false, parts);
+                        Part_Utility.OffsetPartPosition(new Vector2(small_move, 0), false, parts);
                         break;
                 }
             }
@@ -98,16 +107,16 @@ namespace RandomTweaks
                 switch (direction)
                 {
                     case PartMoveDirection.Up:
-                        Part_Utility.OffsetPartPosition(new Vector2(0, 0.5f), true, parts);
+                        Part_Utility.OffsetPartPosition(new Vector2(0, normal_move), true, parts);
                         break;
                     case PartMoveDirection.Down:
-                        Part_Utility.OffsetPartPosition(new Vector2(0, -0.5f), true, parts);
+                        Part_Utility.OffsetPartPosition(new Vector2(0, -normal_move), true, parts);
                         break;
                     case PartMoveDirection.Left:
-                        Part_Utility.OffsetPartPosition(new Vector2(-0.5f, 0), true, parts);
+                        Part_Utility.OffsetPartPosition(new Vector2(-normal_move, 0), true, parts);
                         break;
                     case PartMoveDirection.Right:
-                        Part_Utility.OffsetPartPosition(new Vector2(0.5f, 0), true, parts);
+                        Part_Utility.OffsetPartPosition(new Vector2(normal_move, 0), true, parts);
                         break;
                 }
             }
@@ -125,21 +134,24 @@ namespace RandomTweaks
         {
             Part[] parts = BuildManager.main.holdGrid.selector.selected.ToArray();
 
+            float normal_resize = PlayerPreferences.custom_values.normal_resize;
+            float small_resize = PlayerPreferences.custom_values.small_resize;
+
             if (Input.GetKey(KeyCode.LeftShift))
             {
                 switch (resize_type)
                 {
                     case PartResizeType.IncreaseWidth:
-                        ResizeParts(new Vector3(0.1f, 0, 0), parts);
+                        ResizeParts(new Vector3(small_resize, 0, 0), parts);
                         break;
                     case PartResizeType.DecreaseWidth:
-                        ResizeParts(new Vector3(-0.1f, 0, 0), parts);
+                        ResizeParts(new Vector3(-small_resize, 0, 0), parts);
                         break;
                     case PartResizeType.IncreaseHeight:
-                        ResizeParts(new Vector3(0, 0.1f, 0), parts);
+                        ResizeParts(new Vector3(0, small_resize, 0), parts);
                         break;
                     case PartResizeType.DecreaseHeight:
-                        ResizeParts(new Vector3(0, -0.1f, 0), parts);
+                        ResizeParts(new Vector3(0, -small_resize, 0), parts);
                         break;
                 }
             }
@@ -148,16 +160,16 @@ namespace RandomTweaks
                 switch (resize_type)
                 {
                     case PartResizeType.IncreaseWidth:
-                        ResizeParts(new Vector3(0.5f, 0, 0), parts);
+                        ResizeParts(new Vector3(normal_resize, 0, 0), parts);
                         break;
                     case PartResizeType.DecreaseWidth:
-                        ResizeParts(new Vector3(-0.5f, 0, 0), parts);
+                        ResizeParts(new Vector3(-normal_resize, 0, 0), parts);
                         break;
                     case PartResizeType.IncreaseHeight:
-                        ResizeParts(new Vector3(0, 0.5f, 0), parts);
+                        ResizeParts(new Vector3(0, normal_resize, 0), parts);
                         break;
                     case PartResizeType.DecreaseHeight:
-                        ResizeParts(new Vector3(0, -0.5f, 0), parts);
+                        ResizeParts(new Vector3(0, -normal_resize, 0), parts);
                         break;
                 }
             }
@@ -195,17 +207,19 @@ namespace RandomTweaks
         [HarmonyPrefix]
         public static void Prefix(ref float rotation)
         {
+            float small_rotate = PlayerPreferences.custom_values.small_rotate;
+
             if (Input.GetKey(KeyCode.LeftShift))
             {
                 // Only affect 90º Rotations
                 if (rotation == 90f)
                 {
-                    rotation = 15f;
+                    rotation = small_rotate;
 
                 }
                 else if (rotation == -90f)
                 {
-                    rotation = -15f;
+                    rotation = -small_rotate;
                 }
             }
         }
