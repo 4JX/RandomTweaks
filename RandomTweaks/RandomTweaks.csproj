@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BuildView.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="OverridePauseMenu.cs" />
     <Compile Include="WorldView.cs" />
     <Compile Include="Main.cs" />
