@@ -5,6 +5,7 @@ using SFS.Parsers.Json;
 using SFS.Translations;
 using SFS.UI;
 using System;
+using System.Globalization;
 using UnityEngine;
 using static SFS.Input.KeybindingsPC;
 
@@ -51,7 +52,6 @@ namespace RandomTweaks
         public static DefaultData custom_keys = new DefaultData();
         public class DefaultData
         {
-            public Key Placeholder_Key = KeyCode.Hash;
 
             public Key[] Move_Parts = new Key[4]
             {
@@ -96,9 +96,10 @@ namespace RandomTweaks
             // Reflection needed since these are private
             Traverse createTraverse = Traverse.Create(__instance).Method("Create", new object[] { custom_keys.Move_Parts[0], defaultData.Move_Parts[0], "Move_Selected_Up" });
             Traverse createSpaceTraverse = Traverse.Create(__instance).Method("CreateSpace");
+            Traverse createTextTraverse = Traverse.Create(__instance).Method("CreateText", "RandomTweaks Keybinds");
 
             // Finally actually call the code
-            createTraverse.GetValue(new object[] { defaultData.Placeholder_Key, defaultData.Placeholder_Key, "--RandomTweaks Keybinds--" });
+            createTextTraverse.GetValue("RandomTweaks Keybinds");
             createTraverse.GetValue(new object[] { custom_keys.Move_Parts[0], defaultData.Move_Parts[0], "Move_Selected_Up" });
             createTraverse.GetValue(new object[] { custom_keys.Move_Parts[1], defaultData.Move_Parts[1], "Move_Selected_Down" });
             createTraverse.GetValue(new object[] { custom_keys.Move_Parts[2], defaultData.Move_Parts[2], "Move_Selected_Left" });
@@ -153,7 +154,7 @@ namespace RandomTweaks
             {
                 try
                 {
-                    float new_value = Int32.Parse(value[0]);
+                    float new_value = float.Parse(value[0], CultureInfo.InvariantCulture);
                     custom_values.small_move = new_value;
                     Save();
                 }
@@ -173,7 +174,7 @@ namespace RandomTweaks
             {
                 try
                 {
-                    float new_value = Int32.Parse(value[0]);
+                    float new_value = float.Parse(value[0], CultureInfo.InvariantCulture);
                     custom_values.small_rotate = new_value;
                     Save();
                 }
@@ -193,7 +194,7 @@ namespace RandomTweaks
             {
                 try
                 {
-                    float new_value = Int32.Parse(value[0]);
+                    float new_value = float.Parse(value[0], CultureInfo.InvariantCulture);
                     custom_values.small_move = new_value;
                     Save();
                 }

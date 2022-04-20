@@ -15,7 +15,7 @@ namespace RandomTweaks
         "RandomTweaks", // Mod Name
         "Infinity", // Mod Author
         "v1.2.x", // Mod loader version
-        "v1.3" // Mod version
+        "v1.3.1" // Mod version
         )
         { }
 
